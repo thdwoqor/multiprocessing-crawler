@@ -14,6 +14,12 @@ pip install -r requirements.txt
 python -m run.py
 ```
 
+# ERD
+![erd](https://user-images.githubusercontent.com/83541246/189023959-ba040309-166d-4653-bb08-58f36d7b46a5.png)
+
+# Optimal number of processes
+...
+
 # Pseudocode
 
 ### multiprocessing
