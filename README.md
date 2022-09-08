@@ -3,7 +3,7 @@
 ### Installation
 
 ```sh
-git clone https://github.com/
+git clone https://github.com/thdwoqor/multiprocessing-crawler
 python -m venv .venv
 pip install -r requirements.txt
 ```
