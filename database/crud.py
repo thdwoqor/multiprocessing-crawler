@@ -11,7 +11,7 @@ def create_store(db_session, name):
 
 
 def create_work(db_session, name):
-    pk = uuid.uuid4()
+    pk = str(uuid.uuid4())
     work = Work(uuid=pk, name=name)
     db_session.add(work)
     db_session.commit()

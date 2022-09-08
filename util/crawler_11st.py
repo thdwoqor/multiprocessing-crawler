@@ -31,11 +31,11 @@ class Crawler_11st(Crawler):
         self.driver.quit()
 
     def get_data(self, sum: int, max: int, queue, lock, uuid: str):
-        from database.conn import db_session
+        from database.conn import db
         from database.crud import create_product
 
         self.set()
-        time.sleep(10)
+        time.sleep(15)
         while not queue.empty():
             seller = title = price = company = "Unknown"
 
@@ -66,7 +66,7 @@ class Crawler_11st(Crawler):
                 if "브랜드" in table.text:
                     company = table.text.split()[1]
             try:
-                create_product(db_session, url, seller, company, title, price, uuid)
+                create_product(db.session, url, seller, company, title, price, uuid)
             except Exception as e1:
                 print(e1)
             lock.acquire()

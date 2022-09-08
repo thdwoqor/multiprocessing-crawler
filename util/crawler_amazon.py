@@ -43,7 +43,7 @@ class Crawler_Amazon(Crawler):
         self.driver.quit()
 
     def get_data(self, sum: int, max: int, queue, lock, uuid: str):
-        from database.conn import db_session
+        from database.conn import db
         from database.crud import create_product
 
         self.set()
@@ -74,7 +74,7 @@ class Crawler_Amazon(Crawler):
             except Exception:
                 print("No such price")
 
-            create_product(db_session, url, seller, company, title, price, uuid)
+            create_product(db.session, url, seller, company, title, price, uuid)
             lock.acquire()
             sum.value += 1
             print(sum.value)
