@@ -11,8 +11,8 @@ from util.mult import Mult
 load_dotenv()
 
 keyword = "CPU"
-max = 700
-process = 5
+max = 100
+process = 7
 
 if __name__ == "__main__":
     start = datetime.datetime.now()

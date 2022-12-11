@@ -1,21 +1,24 @@
+import re
 import time
 from multiprocessing import Queue
 
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 
 from util.crawler import Crawler
 
 
-class Crawler_Amazon(Crawler):
+class Crawler_Ebay(Crawler):
     def get_url(self, keyword: str, max: int, url: Queue):
         self.set()
         sum = 0
 
-        for page in range(1, 100000):
+        for page in range(1, 15):
             try:
-                self.driver.get(f"https://www.amazon.com/s?k={keyword}&s=review-rank&page={page}&crid=AWX4F1JLSYE3&qid=1652430281&sprefix={keyword}%2Caps%2C243&ref=sr_pg_{page}")
+                self.driver.get(f"https://www.ebay.com/sch/i.html?_nkw={keyword}&_pgn={page}")
                 time.sleep(1)
-                links = self.driver.find_elements(By.XPATH, '//a[@class="a-link-normal s-no-outline"]')
+                links = self.driver.find_elements(By.CLASS_NAME, "s-item__link")
 
                 for element in links[1:]:
                     url.put(element.get_attribute("href"))
@@ -33,7 +36,7 @@ class Crawler_Amazon(Crawler):
         from database.crud import create_product
 
         self.set()
-        time.sleep(10)
+        time.sleep(15)
         while not queue.empty():
             seller = title = price = company = "Unknown"
 
@@ -43,24 +46,29 @@ class Crawler_Amazon(Crawler):
             self.driver.get(url)
 
             try:
-                element_text = None
-                for _ in range(1000):
-                    try:
-                        element_text = self.driver.find_element(By.ID, "productTitle").text
-                        if element_text is not None:
-                            break
-                    except Exception as e1:
-                        print(e1)
-                title = element_text
+                WebDriverWait(self.driver, 5).until(EC.presence_of_element_located((By.ID, "vi-lkhdr-itmTitl")))
+                title = self.driver.find_element(By.ID, "vi-lkhdr-itmTitl").get_attribute("textContent")
             except Exception:
                 print("No such title")
-
+                print(url)
             try:
-                price = self.driver.find_element(By.XPATH, '//*[@id="corePriceDisplay_desktop_feature_div"]/div[1]/span/span[2]/span[2]').text
+                price = self.driver.find_element(By.CLASS_NAME, "notranslate").text
+                price = re.sub(r"^\s+|\s+$", "", price)
             except Exception:
                 print("No such price")
+                print(url)
+            try:
+                company = self.driver.find_element(By.XPATH, "//span[@itemprop = 'brand']").text
+            except Exception:
+                print("No such company")
+                print(url)
 
-            create_product(db.session, url, seller, company, title, price, uuid)
+            try:
+                create_product(db.session, url, seller, company, title, price, uuid)
+            except Exception as e1:
+                print(e1)
+                print(url)
+
             lock.acquire()
             sum.value += 1
             print(sum.value)
